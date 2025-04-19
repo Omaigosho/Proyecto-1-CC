@@ -1,9 +1,15 @@
-
 from modules.tools import vig_matrix
 import os
 def main():
     print("Bienvenido al Codificador/Decodificador")
     print("-----------------------------------------------")
+    print("----------------- Autores ---------------------")
+    print("-----------------------------------------------")
+    print("- Edson Joao Andrés Pereira Alvarado - 25000144")
+    print("- Edgar Andrés Ozaeta Alvarado - 25000137")
+    print("")
+    print("")
+
     
     # Cargar la matriz Vigenère al iniciar
     matriz_vigenere = vig_matrix()
@@ -36,8 +42,7 @@ def main():
                     else:
                         llave_actual += letra
                 print("resultado >> nueva llave aceptada")
-            else:
-                print("ERROR! Expresion no valida")
+            
 
             
         #Comando encode-text: toma la llave de encriptacion para manipular el texto que se envie junto con el comando
@@ -87,10 +92,34 @@ def main():
                         print(f'resultado >> {prompt}')
                     else:
                         print(f'ERROR! {prompt}')
-               
+
+
+        elif len(comando) > 12 and comando[:11] == "decode-file" and comando[11] == ' ':
+            llave_or_arc = comando[11:].strip().split()
+            if len(llave_or_arc) == 2:
+                if '.' in llave_or_arc[1]:
+                    llave_comm = llave_or_arc[0].lower()
+                    archivo = llave_or_arc[1]
+            elif len(llave_or_arc) == 1:
+                llave_comm = llave_actual
+                archivo = llave_or_arc[0]
+            else:
+                    print('No hay parametros!')
+                    continue
+                
+            if llave_comm == ' ':
+                    print('ERROR! Falta establecer una llave')
+            else:
+                    sent, prompt = decodeFiles(archivo, llave_comm, matriz_vigenere)
+                    if sent == True:
+                        print(f'resultado >> {prompt}')
+                    else:
+                        print(f'ERROR! {prompt}')
+        else:
+                print("ERROR! Expresion no valida")       
 
                    
-#Función encargada de la codificación de los textos (te toca ver que onda con las tildes jajajaj)
+#Función encargada de la codificación de los textos
 def codificar(texto, llave, matriz):
     resultado = ""
     indice_llave = 0
@@ -155,12 +184,44 @@ def encodeFiles(archivo, llave, matriz):
     contents = open_arc.read()
 
     encr_contents = codificar(contents, llave, matriz)
-    arc_output = os.path.splitext(archivo)[0] + '.gcf'
-    open_arc.close()
+    nom_base = os.path.splitext(archivo)[0]
+    arc_output = f"{nom_base}.gcf"
+    
+    cont = 1
+    while os.path.exists(arc_output):
+        arc_output = f"{nom_base}({cont}).gcf"
+        cont += 1
 
     open_arc = open(arc_output, 'w')
     open_arc.write(encr_contents)
 
+    return True, arc_output
+
+def decodeFiles(archivo, llave, matriz):
+    if not os.path.exists(archivo):
+        return False, f"Tu archivo {archivo} parece no existir. Revisa su localización o si lo escribiste de manera correcta."
+    if not archivo.lower().endswith('.gcf'):
+        return False, f"Tu archivo {archivo} no es un archivo de texto con la extensión .gcf, por lo que no podemos procesarlo."
+    
+    open_arc = open(archivo, 'r')
+    contents = open_arc.read()
+    open_arc.close()
+
+    decr_contents = decodificar(contents, llave, matriz)
+    nom_base = os.path.splitext(archivo)[0]
+    arc_output = f"{nom_base}-decoded.txt"
+    
+    cont = 1
+    while os.path.exists(arc_output):
+        arc_output = f"{nom_base}-decoded({cont}).txt"
+        cont += 1
+    
+    open_arc = open(arc_output, 'w')
+    open_arc.write(decr_contents)
+    open_arc.close()
+
+
+    
     return True, arc_output
 
 
