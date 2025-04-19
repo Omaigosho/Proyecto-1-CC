@@ -1,5 +1,5 @@
 from modules.tools import vig_matrix
-
+import os
 def main():
     print("Bienvenido al Codificador/Decodificador")
     print("-----------------------------------------------")
@@ -37,7 +37,9 @@ def main():
                 print("resultado >> nueva llave aceptada")
             else:
                 print("ERROR! Expresion no valida")
-        
+
+            
+        #Comando encode-text: toma la llave de encriptacion para manipular el texto que se envie junto con el comando
         elif len(comando) > 12 and comando[:11] == "encode-text" and comando[11] == ' ':
             if llave_actual == "":
                 print("ERROR! No hay llave establecida")
@@ -49,6 +51,9 @@ def main():
                     codificado = codificar(texto, llave_actual, matriz_vigenere)
                     print("resultado >> " + codificado)
         
+        
+        #Comando decode-text: toma la llave actual y el texto codificado para devolver el texto original  
+        # (devuelve un sinsentido si la llave no es la misma que la del momento de encriptacion)
         elif len(comando) > 12 and comando[:11] == "decode-text" and comando[11] == ' ':
             if llave_actual == "":
                 print("ERROR! No hay llave establecida")
@@ -60,6 +65,30 @@ def main():
                     decodificado = decodificar(texto, llave_actual, matriz_vigenere)
                     print("resultado >> " + decodificado)
 
+        elif len(comando) > 12 and comando[:11] == "encode-file" and comando[11] == ' ':
+            llave_or_arc = comando[11:].strip().split()
+            if len(llave_or_arc) == 2:
+                if '.' in llave_or_arc[1]:
+                    llave_comm = llave_or_arc[0].lower()
+                    archivo = llave_or_arc[1]
+            elif len(llave_or_arc) == 1:
+                llave_comm = llave_actual
+                archivo = llave_or_arc[0]
+            else:
+                    print('No hay parametros!')
+                    continue
+                
+            if llave_comm == ' ':
+                    print('ERROR! Falta establecer una llave')
+            else:
+                    sent, prompt = encodeFiles(archivo, llave_comm, matriz_vigenere)
+                    if sent == True:
+                        print(f'resultado >> {prompt}')
+                    else:
+                        print(f'ERROR! {prompt}')
+               
+
+                   
 #Función encargada de la codificación de los textos (te toca ver que onda con las tildes jajajaj)
 def codificar(texto, llave, matriz):
     resultado = ""
@@ -112,5 +141,27 @@ def decodificar(texto, llave, matriz):
             resultado += caracter
     
     return resultado
+
+#Fuuncion para codificar texto de archivos y los mismos archivos (tenes que tener el archivo ya hecho con texto ya puesto)
+def encodeFiles(archivo, llave, matriz):
+    if not os.path.exists(archivo):
+        return False, f"Tu archivo {archivo} parece no existir. Revisa su localización o si lo escribiste de manera correcta."
+    if archivo.lower().endswith('.txt') == False:
+        return False, f"Tu archivo {archivo} no es un archivo de texto con la extensión .txt, por lo que no podemos procesarlo."
+    
+    open_arc = open(archivo, 'r')
+
+    contents = open_arc.read()
+
+    encr_contents = codificar(contents, llave, matriz)
+    arc_output = os.path.splitext(archivo)[0] + '.gcf'
+    open_arc.close()
+
+    open_arc = open(arc_output, 'w')
+    open_arc.write(encr_contents)
+
+    return True, arc_output
+
+
 
 main()
