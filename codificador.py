@@ -19,7 +19,7 @@ def main():
         print("codificador >> ", end="")
         comando = input()
         
-         # Comando para salir del programa
+         # Comando quit: Comando para salir del programa
         if comando == "quit":
             print("Saliendo ...")
             print("Gracias por usar nuestro codificador.")
@@ -70,7 +70,7 @@ def main():
                 else:
                     decodificado = decodificar(texto, llave_actual, matriz_vigenere)
                     print("resultado >> " + decodificado)
-
+        #Comando encode-file: Encripta un archivo de texto con la llave implicita o la dada por el usuario, resultando en un archivo de extension .gcf
         elif len(comando) > 12 and comando[:11] == "encode-file" and comando[11] == ' ':
             llave_or_arc = comando[11:].strip().split()
             if len(llave_or_arc) == 2:
@@ -93,7 +93,7 @@ def main():
                     else:
                         print(f'ERROR! {prompt}')
 
-
+        #Comando decode-file: Con el archivo encriptado con extension .gcf, se otorga la llave implicita o una dada por el usuario para desencriptar el contenido y retornar un archivo .txt
         elif len(comando) > 12 and comando[:11] == "decode-file" and comando[11] == ' ':
             llave_or_arc = comando[11:].strip().split()
             if len(llave_or_arc) == 2:
@@ -196,7 +196,7 @@ def encodeFiles(archivo, llave, matriz):
     open_arc.write(encr_contents)
 
     return True, arc_output
-
+#Funcion para la decodificacion de archivos
 def decodeFiles(archivo, llave, matriz):
     if not os.path.exists(archivo):
         return False, f"Tu archivo {archivo} parece no existir. Revisa su localización o si lo escribiste de manera correcta."
