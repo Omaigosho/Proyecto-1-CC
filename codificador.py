@@ -8,10 +8,14 @@ def main():
     print("- Edson Joao Andrés Pereira Alvarado - 25000144")
     print("- Edgar Andrés Ozaeta Alvarado - 25000137")
     print("")
+    print("--------------- Uso del programa --------------")
+    print('setkey [llave]')
+    print("encode-text [texto]")
+    print("decode-text [texto]")
+    print("encode-file [llave (opcional)] nombreArchivo")
+    print("decode-file [llave (opcional)] nombreArchivo")
     print("")
 
-    
-    # Cargar la matriz Vigenère al iniciar
     matriz_vigenere = vig_matrix()
     llave_actual = ""
     
@@ -84,7 +88,7 @@ def main():
                     print('No hay parametros!')
                     continue
                 
-            if llave_comm == ' ':
+            if len(llave_comm) == 0:
                     print('ERROR! Falta establecer una llave')
             else:
                     sent, prompt = encodeFiles(archivo, llave_comm, matriz_vigenere)
@@ -107,7 +111,7 @@ def main():
                     print('No hay parametros!')
                     continue
                 
-            if llave_comm == ' ':
+            if len(llave_comm) == 0:
                     print('ERROR! Falta establecer una llave')
             else:
                     sent, prompt = decodeFiles(archivo, llave_comm, matriz_vigenere)
@@ -123,9 +127,30 @@ def main():
 def codificar(texto, llave, matriz):
     resultado = ""
     indice_llave = 0
+    i = 0
+    n = len(texto)
     
-    for caracter in texto:
-        if caracter.isalpha():
+    while i < n:
+        caracter = texto[i]
+        
+        # Si encontramos una barrita invertida, la manejamos de manera distinta
+        if caracter == '\\':
+            
+            if i + 1 < n:
+                siguiente_caracter = texto[i+1]
+                
+                if siguiente_caracter.isalpha():
+                    
+                    resultado += '\\\\'
+                    i += 1  
+                else:
+                    
+                    resultado += '\\'
+            else:
+                
+                resultado += '\\'
+            i += 1
+        elif caracter.isalpha():
             es_minuscula = caracter.islower()
             letra = caracter.upper()
             clave = llave[indice_llave % len(llave)].upper()
@@ -139,8 +164,10 @@ def codificar(texto, llave, matriz):
             
             resultado += nuevo_caracter
             indice_llave += 1
+            i += 1
         else:
             resultado += caracter
+            i += 1
     
     return resultado
 
@@ -148,15 +175,30 @@ def codificar(texto, llave, matriz):
 def decodificar(texto, llave, matriz):
     resultado = ""
     indice_llave = 0
+    i = 0
+    n = len(texto)
     
-    for caracter in texto:
-        if caracter.isalpha():
+    while i < n:
+        caracter = texto[i]
+        
+        # Si encontramos una barrita invertida, la manejamos de manera distinta
+        if caracter == '\\':
+            
+            if i + 1 < n and texto[i+1] == '\\':
+                
+                resultado += '\\'
+                i += 2  
+            else:
+               
+                resultado += '\\'
+                i += 1
+        elif caracter.isalpha():
             es_minuscula = caracter.islower()
             letra = caracter.upper()
             clave = llave[indice_llave % len(llave)].upper()
             
             columna = ord(clave) - ord('A')
-            # Recorremos la matriz en busca de la letra
+           
             for fila in range(len(matriz)):
                 if matriz[fila][columna] == letra:
                     nuevo_caracter = chr(fila + ord('A'))
@@ -167,8 +209,10 @@ def decodificar(texto, llave, matriz):
             
             resultado += nuevo_caracter
             indice_llave += 1
+            i += 1
         else:
             resultado += caracter
+            i += 1
     
     return resultado
 
